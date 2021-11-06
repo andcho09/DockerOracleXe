@@ -1,0 +1,12 @@
+version: "3.8"
+
+services:
+  oraclexe:
+    image: oracle/database:18.4.0-xe
+    ports:
+      - 1521:1521
+      - 5500:5500
+    volumes:
+      - ./oradata:/opt/oracle/oradata
+      - ./scripts/setup:/opt/oracle/scripts/setup
+      - ./scripts/startup:/opt/oracle/scripts/startup
