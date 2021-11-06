@@ -11,12 +11,14 @@
 ### Database
 
 **Connect** using your SQL tool of choice to:
-* server: localhost
-* port: 1521 (depends on port mapping in docker
-* service: XE
-* username = sys as sysdba (not you will want to create additional users
+* server: ``localhost``
+* port: ``1521`` (depends on port mapping in docker)
+* service: ``XE``
+* username = ``sys as sysdba`` (not you will want to create additional users under ``XEPDB1``)
 
-Or use browser to access Oracle Enterpise Manager at https://localhost:5500/em
+Note for non-sysdba connections, connect to server ``XEPDB1``
+
+Or use browser to access Oracle Enterprise Manager at https://localhost:5500/em
 * **TODO** this isn't working, port is listening but not data back
 
 Or **connect using SQLPlus**
@@ -55,7 +57,7 @@ GRANT CREATE TABLE, CREATE VIEW, CREATE PROCEDURE, CREATE SEQUENCE TO MYUSER;
 	* docker
 	* docker-compose
 
-1. The following steps summare instructions from:
+1. The following steps summarise instructions from:
 	* https://github.com/oracle/docker-images/tree/main/OracleDatabase/SingleInstance
 	* https://blogs.oracle.com/oraclemagazine/post/deliver-oracle-database-18c-express-edition-in-containers
 
