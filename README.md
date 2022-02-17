@@ -6,7 +6,9 @@
 
 **Start docker daemon:** ``$ sudo dockerd``
 
-**Start Oracle:** ``$docker compose up``
+**Start Oracle:** ``$ docker-compose up``
+
+**Stop docker:** Just ``CTRL + C`` it, it will stop gracefully
 
 ### Database
 
@@ -65,10 +67,30 @@ GRANT CREATE TABLE, CREATE VIEW, CREATE PROCEDURE, CREATE SEQUENCE TO MYUSER;
 
 1. Update ``docker-compose.yml`` so the image and tag match the built image
 
-1. On host, the ``oradata`` directory must be writable by the container (this is where data is persisted)
+1. On the host, the ``oradata`` directory must be writeable by the container (this is where data is persisted)
 
 	```
 	$ sudo chown 54321:54321 oradata
 	```
 
 1. Start the container and the password will be auto-generated on first start (or change it using the instructions on [Github](https://github.com/oracle/docker-images/tree/main/OracleDatabase/SingleInstance))
+
+
+## Issues And Future Work
+
+* Fix https://localhost:5500/em
+* Container is memory hungry and will uses all of the hosts free memory. Workaround by limiting WSL2 memory:
+
+	1. In command prompt: ``$ wsl --shutdown``
+	1. Edit ``%USERPROFILE%\.wslconfig`` to be:
+
+		```
+		# Global WSL 2 config
+		# See https://docs.microsoft.com/en-us/windows/wsl/wsl-config
+
+		[wsl2]
+		memory=6GB
+		```
+
+	1. Start WSL. Note shutdown from step 1 takes [about 8 seconds](https://docs.microsoft.com/en-us/windows/wsl/wsl-config#the-8-second-rule). The command ``$ wsl --list --running`` will confirm it has stopped.
+
