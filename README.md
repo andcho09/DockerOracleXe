@@ -1,10 +1,10 @@
-# Oracle XE In Docker
+# Oracle XE In Docker WSL
 
 ## Usage
 
 ### Docker
 
-**Start docker daemon:** ``$ sudo dockerd``
+**Start docker daemon:** ``$ sudo dockerd`` (or use Docker Desktop for Windows if that's installed)
 
 **Start Oracle:** ``$ docker-compose up``
 
@@ -20,8 +20,8 @@
 
 Note for non-sysdba connections, connect to server ``XEPDB1``
 
-Or use browser to access Oracle Enterprise Manager at https://localhost:5500/em
-* **TODO** this isn't working, port is listening but not data back
+Or use browser to access Oracle Enterprise Manager at https://localhost:5500/em as sys
+* Note there's a bug where the port doesn't listen on start up, see the [Issues And Future Work](#issues-and-future-work) section below
 
 Or **connect using SQLPlus**
 1. On host:
@@ -63,11 +63,11 @@ GRANT CREATE TABLE, CREATE VIEW, CREATE PROCEDURE, CREATE SEQUENCE TO MYUSER;
 	* https://github.com/oracle/docker-images/tree/main/OracleDatabase/SingleInstance
 	* https://blogs.oracle.com/oraclemagazine/post/deliver-oracle-database-18c-express-edition-in-containers
 
-1. Clone the git repo and run the script ``/buildDockerImage.sh -v 18.4.0 -x`` script to build docker images for Oracle XE
+1. Clone the git repo and run the script ``/buildDockerImage.sh -v 21.3.0 -x`` script to build docker images for Oracle XE
 
 1. Update ``docker-compose.yml`` so the image and tag match the built image
 
-1. On the host, the ``oradata`` directory must be writeable by the container (this is where data is persisted)
+1. On the host, the ``oradata`` directory must be writeable by the oracle user (UID 54321) inside the container (this is where data is persisted):
 
 	```
 	$ sudo chown 54321:54321 oradata
@@ -78,8 +78,18 @@ GRANT CREATE TABLE, CREATE VIEW, CREATE PROCEDURE, CREATE SEQUENCE TO MYUSER;
 
 ## Issues And Future Work
 
-* Fix https://localhost:5500/em
-* Container is memory hungry and will uses all of the hosts free memory. Workaround by limiting WSL2 memory:
+### Fix Oracle Enterprise Manager access
+
+On startup, https://localhost:5500/em is inaccessible. Workaround from this [issue](https://github.com/oracle/docker-images/issues/1545) is to bounch the port using SQLplus. Connect using ``sys as sysdba`` then:
+
+		SQL> exec DBMS_XDB_CONFIG.SETHTTPSPORT(0);
+		SQL> exec DBMS_XDB_CONFIG.SETHTTPSPORT(5500);
+
+Also note that versions [prior to 19c](https://support.oracle.com/knowledge/Oracle%20Database%20Products/2723592_1.html) use Adobe Flash.
+
+### Container is memory hungry and will uses all of the hosts free memory
+
+Workaround by limiting WSL2 memory:
 
 	1. In command prompt: ``$ wsl --shutdown``
 	1. Edit ``%USERPROFILE%\.wslconfig`` to be:
@@ -93,4 +103,3 @@ GRANT CREATE TABLE, CREATE VIEW, CREATE PROCEDURE, CREATE SEQUENCE TO MYUSER;
 		```
 
 	1. Start WSL. Note shutdown from step 1 takes [about 8 seconds](https://docs.microsoft.com/en-us/windows/wsl/wsl-config#the-8-second-rule). The command ``$ wsl --list --running`` will confirm it has stopped.
-
